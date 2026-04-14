@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsuranceIQ — Login</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #1a3c5e 0%, #0d6efd 60%, #198754 100%);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 24px 64px rgba(0,0,0,.28);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1a3c5e, #0d6efd);
+            color: #fff;
+            padding: 36px 40px 28px;
+            text-align: center;
+        }
+        .logo { font-size: 48px; margin-bottom: 8px; }
+        .card-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+        .card-header p { opacity: .85; font-size: 13px; }
+
+        .card-body { padding: 36px 40px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color .2s;
+            outline: none;
+            color: #1a202c;
+        }
+        .form-group input:focus { border-color: #0d6efd; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1a3c5e, #0d6efd);
+            color: #fff;
+            margin-bottom: 14px;
+        }
+        .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #1a3c5e;
+            border: 2px solid #cbd5e1;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+        }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-success { background: #dcfce7; color: #166534; }
+
+        .divider {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 14px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header">
+        <div class="logo">🛡️</div>
+        <h1>InsuranceIQ</h1>
+        <p>AI-Powered Policy Claim Analyser</p>
+    </div>
+    <div class="card-body">
+        <div id="alertBox" class="alert"></div>
+
+        <!-- Login form -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label for="loginUser">Username</label>
+                <input type="text" id="loginUser" placeholder="Enter your username" autofocus>
+            </div>
+            <div class="form-group">
+                <label for="loginPass">Password</label>
+                <input type="password" id="loginPass" placeholder="Enter your password">
+            </div>
+            <button class="btn btn-primary" onclick="login()">Sign In</button>
+            <div class="divider">Don't have an account?</div>
+            <button class="btn btn-secondary" onclick="showRegister()">Create Account</button>
+        </div>
+
+        <!-- Register form -->
+        <div id="registerForm" style="display:none">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUser" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPass" placeholder="Minimum 6 characters">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="regPass2" placeholder="Repeat password">
+            </div>
+            <button class="btn btn-primary" onclick="register()">Register</button>
+            <div class="divider">Already have an account?</div>
+            <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
+        </div>
+
+        <p class="footer-note">Your queries and documents are private and never shared.</p>
+    </div>
+</div>
+
+<script>
+    function alert(type, msg) {
+        const box = document.getElementById('alertBox');
+        box.className = `alert alert-${type}`;
+        box.textContent = msg;
+        box.style.display = 'block';
+    }
+    function clearAlert() { document.getElementById('alertBox').style.display = 'none'; }
+
+    function showRegister() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        clearAlert();
+    }
+    function showLogin() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        clearAlert();
+    }
+
+    async function login() {
+        const username = document.getElementById('loginUser').value.trim();
+        const password = document.getElementById('loginPass').value;
+        if (!username || !password) return alert('error', 'Please fill in all fields.');
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+        if (data.success) { window.location.replace('/home'); }
+        else { alert('error', data.message || 'Invalid credentials'); }
+    }
+
+    async function register() {
+        const username = document.getElementById('regUser').value.trim();
+        const password = document.getElementById('regPass').value;
+        const confirm = document.getElementById('regPass2').value;
+        if (!username || !password || !confirm) return alert('error', 'Please fill in all fields.');
+        if (password !== confirm) return alert('error', 'Passwords do not match.');
+        if (password.length < 6) return alert('error', 'Password must be at least 6 characters.');
+        const res = await fetch('/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('success', 'Registered! Please sign in.');
+            setTimeout(() => { document.getElementById('loginUser').value = username; showLogin(); }, 1500);
+        } else { alert('error', data.message); }
+    }
+
+    document.addEventListener('keypress', e => {
+        if (e.key !== 'Enter') return;
+        if (document.getElementById('loginForm').style.display !== 'none') login();
+        else register();
+    });
+</script>
+</body>
+</html>

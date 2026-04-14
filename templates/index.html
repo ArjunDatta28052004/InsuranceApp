@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsuranceIQ — Claim Analyser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<!-- ══ TOP NAV ══════════════════════════════════════════════════════════════ -->
+<header class="topnav">
+    <div class="nav-brand">
+        <span class="nav-logo">🛡️</span>
+        <div>
+            <div class="nav-title">InsuranceIQ</div>
+            <div class="nav-sub">AI Policy Claim Analyser</div>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <div class="user-pill">
+            <span class="user-icon">👤</span>
+            <span id="navUsername">{{ username }}</span>
+        </div>
+        <button class="nav-btn" onclick="toggleHistory()" title="History">📜 History</button>
+        <button class="nav-btn" onclick="exportToExcel()" title="Export">📥 Export</button>
+        <button class="nav-btn danger" onclick="logout()" title="Logout">🚪 Logout</button>
+    </div>
+</header>
+
+<!-- ══ MAIN LAYOUT ══════════════════════════════════════════════════════════ -->
+<main class="layout">
+
+    <!-- ── LEFT: Document panel ── -->
+    <aside class="panel panel-docs">
+        <div class="panel-head">
+            <span>📁 My Policy Documents</span>
+            <span class="badge" id="docBadge">0</span>
+        </div>
+
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="pdfInput" accept=".pdf" hidden onchange="uploadPDF()">
+            <label for="pdfInput" class="upload-label" id="uploadLabel">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Upload Insurance PDF</div>
+                <div class="upload-hint">Click or drag & drop</div>
+            </label>
+            <div id="progressWrap" class="progress-wrap" style="display:none">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+                <div class="progress-label" id="progressLabel">Processing…</div>
+            </div>
+        </div>
+
+        <ul class="doc-list" id="docList">
+            <li class="doc-empty">No documents yet.</li>
+        </ul>
+
+        <!-- Stats -->
+        <div class="stats-box" id="statsBox">
+            <div class="stat"><span id="statDocs">0</span><small>Docs</small></div>
+            <div class="stat"><span id="statQs">0</span><small>Queries</small></div>
+            <div class="stat"><span id="statAs">0</span><small>Answers</small></div>
+        </div>
+    </aside>
+
+    <!-- ── CENTER: Chat area ── -->
+    <section class="chat-area">
+        <div class="messages" id="messages">
+            <!-- Welcome card -->
+            <div class="welcome-card" id="welcomeCard">
+                <div class="wc-icon">🛡️</div>
+                <h2>Welcome to InsuranceIQ</h2>
+                <p>Upload your insurance policy PDF, then ask claim questions like:</p>
+                <div class="wc-examples">
+                    <div class="wc-ex" onclick="fillQuestion(this)">56-year-old male, knee replacement surgery, 36 months into the policy. Is this covered?</div>
+                    <div class="wc-ex" onclick="fillQuestion(this)">Does a 2-year waiting period apply to pre-existing diabetes under this plan?</div>
+                    <div class="wc-ex" onclick="fillQuestion(this)">Is chemotherapy covered for a 45-year-old female, 18 months into the policy?</div>
+                    <div class="wc-ex" onclick="fillQuestion(this)">What is the maximum claim amount for hospitalisation above 72 hours?</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-bar">
+            <textarea id="questionInput"
+                      placeholder="Describe the claim scenario… (e.g. age, procedure, months of coverage)"
+                      rows="2"
+                      onkeydown="handleKey(event)"></textarea>
+            <button id="askBtn" onclick="askQuestion()">
+                <span id="askBtnIcon">➤</span>
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<!-- ══ HISTORY MODAL ════════════════════════════════════════════════════════ -->
+<div id="historyModal" class="modal" onclick="closeHistory(event)">
+    <div class="modal-box modal-wide">
+        <div class="modal-head">
+            <h3>📜 Query History</h3>
+            <div style="display:flex;gap:10px;align-items:center">
+                <input type="text" id="histSearch" placeholder="🔍 Search…" oninput="filterHistory()" class="hist-search">
+                <button class="close-btn" onclick="closeHistory()">✕</button>
+            </div>
+        </div>
+        <div class="history-list" id="historyList">
+            <p class="empty-msg">Loading…</p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

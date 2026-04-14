@@ -1,0 +1,9 @@
+flask
+pyodbc
+langchain
+langchain-community
+chromadb
+ollama
+pypdf
+numpy
+python-dotenv
