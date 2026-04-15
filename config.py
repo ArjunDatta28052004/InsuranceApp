@@ -9,9 +9,10 @@ UPLOAD_FOLDER = "uploads"
 CHROMA_DIR = "chroma_db"
 
 EMBED_MODEL = "all-minilm"
-LLM_MODEL = "llama2"
+EMBED_WORKERS = 6
+LLM_MODEL = "mistral"
 SIMILARITY_THRESHOLD = 0.75
-TOP_K = 5
+TOP_K = 2
 
 # Secret key for session management (replace with a fixed secret in production)
 SECRET_KEY = "insurance-app-secret-key-change-in-production"
