@@ -16,7 +16,7 @@ from db import (
     init_db, register_user, verify_user,
     save_document, get_user_documents, check_document_exists_for_user, delete_document,
     save_question, save_answer, fetch_user_questions_with_answers,
-    get_user_history, get_statistics
+    get_user_history, get_statistics, update_answer
 )
 from llm_utils import (
     process_pdf_to_vectorstore, check_pdf_in_user_vectorstore,
@@ -134,6 +134,47 @@ def home():
         return redirect(url_for("login_page"))
     return render_template("index.html", username=session["username"])
 
+@app.route("/batch_process", methods=["POST"])
+def batch_process():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    # Store the actual numeric user_id from the session FIRST
+    current_user_id = session['user_id'] 
+    
+    file = request.files.get('excel_file')
+    if not file:
+        return jsonify({"success": False, "message": "No file uploaded"}), 400
+
+    df = pd.read_excel(file)
+    results = []
+
+    for index, row in df.iterrows():
+        q_text = row['Question']
+        
+        # CRITICAL: Ensure you pass 'current_user_id', NOT the loop index or q_text
+        verdict, expl, clause, src, pg, conf = get_insurance_answer(current_user_id, q_text)
+        results.append({
+            "Question": q_text,
+            "Verdict": verdict,
+            "Clause": clause,
+            "Explanation": expl,
+            "Source": f"{src} (Pg {pg})"
+        })
+
+    output_df = pd.DataFrame(results)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        output_df.to_excel(writer, index=False, sheet_name="Results")
+    output.seek(0)
+    
+    return send_file(output, as_attachment=True, download_name="Batch_Results.xlsx")
+
+@app.route("/edit_answer", methods=["POST"])
+def edit_answer():
+    data = request.json
+    update_answer(data['answer_id'], data['explanation'], data['verdict'])
+    return jsonify({"success": True})
 
 # ── Document routes ───────────────────────────────────────────────────────────
 
