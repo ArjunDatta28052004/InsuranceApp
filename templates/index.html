@@ -24,6 +24,7 @@
         <button class="nav-btn" onclick="toggleHistory()" title="History">📜 History</button>
         <button class="nav-btn" onclick="exportToExcel()" title="Export">📥 Export</button>
         <button class="nav-btn danger" onclick="logout()" title="Logout">🚪 Logout</button>
+        <button class="nav-btn" onclick="uploadBatchExcel()">📊 Batch Analysis</button>
     </div>
 </header>
 
@@ -87,6 +88,12 @@
             <button id="askBtn" onclick="askQuestion()">
                 <span id="askBtnIcon">➤</span>
             </button>
+        </div>
+
+        <div id="resultBox">
+            <div id="explanationDisplay" class="p-3"></div>
+            <button onclick="makeEditable()">Edit Answer</button>
+            <button id="saveBtn" style="display:none;" onclick="saveCorrection()">Save</button>
         </div>
     </section>
 
