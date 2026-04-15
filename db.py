@@ -126,6 +126,17 @@ def verify_user(username, password):
 
 # ── Document helpers ──────────────────────────────────────────────────────────
 
+def update_answer(answer_id, new_explanation, new_verdict):
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE answers 
+        SET answer = ?, verdict = ? 
+        WHERE answer_id = ?
+    """, (new_explanation, new_verdict, answer_id))
+    conn.commit()
+    conn.close()
+
 def save_document(user_id, username, filename, original_filename, filepath):
     """Save document metadata linked to this user only"""
     conn = get_conn()
